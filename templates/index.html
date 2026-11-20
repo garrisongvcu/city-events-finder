@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>City Events &amp; Weather Finder</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .search-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3.5rem 1rem 2rem;
+    }
+    .search-wrapper.centered {
+      flex: 1;
+      padding-bottom: 6rem;
+    }
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      text-align: center;
+    }
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    .search-form {
+      display: flex;
+      width: 100%;
+      max-width: 540px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.35rem;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+    .search-form input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      background: transparent;
+    }
+    .search-form button {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.7rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .search-form button:hover { background: var(--primary-hover); }
+    .container {
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto 3rem;
+      padding: 0 1.25rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
+    }
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.85rem;
+    }
+    .event-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .event-date {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+    .event-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .event-meta {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      margin-top: 0.4rem;
+    }
+    .ticket-link {
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+    .weather-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .current-temp {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin: 0.25rem 0;
+    }
+    .forecast-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .empty-state {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="search-wrapper {% if not query %}centered{% endif %}">
+    <h1>City Events Finder</h1>
+    <p class="subtitle">Search upcoming local events and check the forecast side by side</p>
+    <form class="search-form" method="GET" action="/">
+      <input
+        type="text"
+        name="q"
+        placeholder="Enter city, state (e.g., Richmond, VA)"
+        value="{{ query }}"
+        required
+      />
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  {% if query %}
+  <main class="container">
+    <section>
+      <h2 class="section-title">Upcoming Events in "{{ query }}" (Soonest First)</h2>
+      {% if events %}
+        {% for ev in events %}
+        <article class="event-card">
+          <div>
+            <div class="event-date">{{ ev.local_date }} {% if ev.local_time %}&bull; {{ ev.local_time }}{% endif %}</div>
+            <div class="event-title">{{ ev.title }}</div>
+            <div class="event-meta">{{ ev.venue }}</div>
+            <span class="badge">{{ ev.source }}</span>
+          </div>
+          {% if ev.url and ev.url != "#" %}
+          <a class="ticket-link" href="{{ ev.url }}" target="_blank" rel="noopener">Details &rarr;</a>
+          {% endif %}
+        </article>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          No events found for "{{ query }}". Check your API keys in <code>.env</code> or try another city.
+        </div>
+      {% endif %}
+    </section>
+
+    <aside>
+      <h2 class="section-title">Weather Forecast</h2>
+      {% if weather %}
+      <div class="weather-card">
+        <div class="event-meta">{{ weather.location_label }}</div>
+        <div class="current-temp">{{ weather.current.temperature_2m | round | int }}&deg;F</div>
+        <div class="event-meta" style="margin-bottom: 1rem;">
+          Wind: {{ weather.current.wind_speed_10m }} mph
+        </div>
+        {% for i in range(weather.daily.time | length) %}
+        <div class="forecast-row">
+          <span>{{ weather.daily.time[i] }}</span>
+          <span>
+            <strong>{{ weather.daily.temperature_2m_max[i] | round | int }}&deg;</strong> /
+            {{ weather.daily.temperature_2m_min[i] | round | int }}&deg;F
+            ({{ weather.daily.precipitation_probability_max[i] }}% precip)
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">Weather data unavailable for this location.</div>
+      {% endif %}
+    </aside>
+  </main>
+  {% endif %}
+</body>
+</html>
