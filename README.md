@@ -28,26 +28,26 @@ A containerized web application built with **Flask** (a lightweight **Python** w
 
 ## Local Setup & Run Instructions (Checkpoint 1)
 1. Clone the repository and enter the project directory:
-   ```bash
+    ```bash
    git clone [https://github.com/garrisongvcu/city-events-finder.git](https://github.com/garrisongvcu/city-events-finder.git)
-   cd city-events-finder
+   cd city-events-finder```
 Create and activate a virtual environment, then install dependencies:
     ```bash
 python3 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt```
 
 Add PREDICTHQ_API_KEY (and TICKETMASTER_API_KEY once approved) inside .env. Never commit .env.
 
 Start the local server: 
     ```bash
-python3 app.py
+python3 app.py```
 
 Verify endpoints in  browser:
 http://localhost:8080/health → returns OK (200 OK)
 http://localhost:8080/?q=Richmond → displays sorted events and the Open-Meteo weather forecast
 
-GCP (Google Cloud Platform) Deployment Steps
+## GCP (Google Cloud Platform) Deployment Steps
 1: Project, Budget Alert, & APIs: Selected project city-events-finder-2026, configured a billing budget alert with email thresholds (50%, 90%, 100%), and enabled Artifact Registry API, Cloud Build API, Cloud Run Admin API, Secret Manager API, and Compute Engine API.
 2: Secret Manager: Created secret PREDICTHQ_API_KEY with automatic replication so zero API keys are stored in code, Dockerfiles, or Git history.
 3: Artifact Registry & Cloud Build: Created Docker repository events-finder-repo in us-east4 and built/pushed the container image via Cloud Build:
@@ -61,7 +61,7 @@ GCP (Google Cloud Platform) Deployment Steps
 -Secret reference: PREDICTHQ_API_KEY=PREDICTHQ_API_KEY:latest
 -Autoscaling: Min instances = 0 (scales to zero when idle), Max instances = 5, Concurrency = 80
 
-Issues Encountered & Adjustments Made
+## Issues Encountered & Adjustments Made
 
 1: Accidental Home-Directory Git Initialization & Author Identity: Git was initially initialized in /Users/gregorygarrison/ (~) with a machine-generated author identity and only README.md pushed. Removed ~/.git, created ~/city-events-finder, moved README.md into it, set Git user.name (Gregory Garrison) and user.email (garrisong@vcu.edu), and pushed cleanly to origin/main.
 
@@ -73,7 +73,7 @@ Issues Encountered & Adjustments Made
 
 5: Secret Manager IAM Permission & Region Alignment: Initial Cloud Run deployment failed with Permission denied on PREDICTHQ_API_KEY because 285638961075-compute@developer.gserviceaccount.com lacked roles/secretmanager.secretAccessor, and an initial service was created in europe-west1. Granted roles/secretmanager.secretAccessor on the secret and aligned Cloud Run to us-east4 to match the Artifact Registry image location.
 
-To keep charges near zero after grading, I will delete the Cloud Run service, Artifact Registry repository, and Secret Manager secret (or delete the city-events-finder-2026 project):
+## To keep charges near zero after grading, I will delete the Cloud Run service, Artifact Registry repository, and Secret Manager secret (or delete the city-events-finder-2026 project):
   gcloud config set project city-events-finder-2026
   gcloud run services delete city-events-app --region=us-east4 --quiet
   gcloud artifacts repositories delete events-finder-repo --location=us-east4 --quiet
