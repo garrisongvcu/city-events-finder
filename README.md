@@ -78,7 +78,8 @@ http://localhost:8080/?q=Richmond → displays sorted events and the Open-Meteo 
 5: Secret Manager IAM Permission & Region Alignment: Initial Cloud Run deployment failed with Permission denied on PREDICTHQ_API_KEY because 285638961075-compute@developer.gserviceaccount.com lacked roles/secretmanager.secretAccessor, and an initial service was created in europe-west1. Granted roles/secretmanager.secretAccessor on the secret and aligned Cloud Run to us-east4 to match the Artifact Registry image location.
 
 ## To keep charges near zero after grading, I will delete the Cloud Run service, Artifact Registry repository, and Secret Manager secret (or delete the city-events-finder-2026 project):
+  ```bash
   gcloud config set project city-events-finder-2026
   gcloud run services delete city-events-app --region=us-east4 --quiet
   gcloud artifacts repositories delete events-finder-repo --location=us-east4 --quiet
-  gcloud secrets delete PREDICTHQ_API_KEY --quiet
+  gcloud secrets delete PREDICTHQ_API_KEY --quiet```
