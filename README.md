@@ -1,6 +1,3 @@
-cd ~/city-events-finder
-
-cat << 'EOF' > README.md
 # City Events Finder (GCP Extra Credit Project)
 
 A containerized web application built with **Flask** (a lightweight **Python** web framework) that lets users search a city and state to view upcoming local events sorted chronologically (soonest first) alongside a multi-day weather forecast.
