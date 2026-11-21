@@ -43,16 +43,20 @@ Start the local server:
     ```bash
 python3 app.py```
 
-Verify endpoints in  browser:
+## Verify endpoints in  browser:
+
 http://localhost:8080/health → returns OK (200 OK)
 http://localhost:8080/?q=Richmond → displays sorted events and the Open-Meteo weather forecast
 
 ## GCP (Google Cloud Platform) Deployment Steps
 1: Project, Budget Alert, & APIs: Selected project city-events-finder-2026, configured a billing budget alert with email thresholds (50%, 90%, 100%), and enabled Artifact Registry API, Cloud Build API, Cloud Run Admin API, Secret Manager API, and Compute Engine API.
+
 2: Secret Manager: Created secret PREDICTHQ_API_KEY with automatic replication so zero API keys are stored in code, Dockerfiles, or Git history.
+
 3: Artifact Registry & Cloud Build: Created Docker repository events-finder-repo in us-east4 and built/pushed the container image via Cloud Build:
   gcloud config set project city-events-finder-2026
   gcloud builds submit --tag us-east4-docker.pkg.dev/city-events-finder-2026/events-finder-repo/city-   events-app:v1
+
 4: IAM & Cloud Run Deployment: Granted roles/secretmanager.secretAccessor on PREDICTHQ_API_KEY to the runtime service account (285638961075-compute@developer.gserviceaccount.com) and configured Cloud Run in us-east4 with:
 -Container image: us-east4-docker.pkg.dev/city-events-finder-2026/events-finder-repo/city-events-app:v1
 -Container port: 8080
