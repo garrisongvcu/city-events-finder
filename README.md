@@ -28,11 +28,11 @@ A containerized web application built with **Flask** (a lightweight **Python** w
 
 ## Local Setup & Run Instructions (Checkpoint 1)
 1. Clone the repository and enter the project directory:
-    ```bash
+        ```bash
    git clone [https://github.com/garrisongvcu/city-events-finder.git](https://github.com/garrisongvcu/city-events-finder.git)
    cd city-events-finder```
 Create and activate a virtual environment, then install dependencies:
-    ```bash
+        ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt```
@@ -54,15 +54,22 @@ http://localhost:8080/?q=Richmond → displays sorted events and the Open-Meteo 
 2: Secret Manager: Created secret PREDICTHQ_API_KEY with automatic replication so zero API keys are stored in code, Dockerfiles, or Git history.
 
 3: Artifact Registry & Cloud Build: Created Docker repository events-finder-repo in us-east4 and built/pushed the container image via Cloud Build:
+    ```bash
   gcloud config set project city-events-finder-2026
-  gcloud builds submit --tag us-east4-docker.pkg.dev/city-events-finder-2026/events-finder-repo/city-   events-app:v1
+  gcloud builds submit --tag us-east4-docker.pkg.dev/city-events-finder-2026/events-finder-repo/city-   events-app:v1```
 
 4: IAM & Cloud Run Deployment: Granted roles/secretmanager.secretAccessor on PREDICTHQ_API_KEY to the runtime service account (285638961075-compute@developer.gserviceaccount.com) and configured Cloud Run in us-east4 with:
+
 -Container image: us-east4-docker.pkg.dev/city-events-finder-2026/events-finder-repo/city-events-app:v1
+
 -Container port: 8080
+
 -Health probe: GET /health
+
 -Environment variable: DEFAULT_CITY=Richmond
+
 -Secret reference: PREDICTHQ_API_KEY=PREDICTHQ_API_KEY:latest
+
 -Autoscaling: Min instances = 0 (scales to zero when idle), Max instances = 5, Concurrency = 80
 
 ## Issues Encountered & Adjustments Made
